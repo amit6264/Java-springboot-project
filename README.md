@@ -1,4 +1,4 @@
-# CI/CD Pipeline Configuration Guide
+# CI/CD Pipeline Configuration Guide way
 
 This GitHub Actions workflow automates the build and deployment process for the datastore application. This document explains how to configure all required secrets and environment variables.
 
