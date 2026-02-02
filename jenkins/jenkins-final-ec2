@@ -62,9 +62,9 @@ pipeline {
             steps {
                 sh '''
                 sudo nohup java -jar datastore-0.0.7.jar \
-                --MYSQL_HOST="jdbc:mysql://database-1.cstu40q04izz.us-east-1.rds.amazonaws.com:3306/datastore?createDatabaseIfNotExist=true" \
+                --MYSQL_HOST="jdbc:mysql://database-1.crma0qyygias.eu-north-1.rds.amazonaws.com:3306/datastore?createDatabaseIfNotExist=true" \
                 --MYSQL_USERNAME="admin" \
-                --MYSQL_PASSWORD="Cloud123" \
+                --MYSQL_PASSWORD="cloud123" \
                 --LOG_FILE_PATH="/var/log/app/datastore.log" \
                 --server.port=8084 > /var/log/app/nohup.out 2>&1 &
                 '''
