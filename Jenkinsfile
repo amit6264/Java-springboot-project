@@ -1,68 +1,37 @@
 pipeline {
     agent any
 
-    environment {
-        BACKEND_IMAGE = "backend:latest"
-        FRONTEND_IMAGE = "frontend:latest"
-    }
-
     stages {
 
-        stage('Clone Repository') {
+        stage('Clone Code') {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/amit6264/Java-springboot-project.git'
             }
         }
 
-        stage('Build Backend JAR') {
-            steps {
-                dir('backend') {
-                    sh 'mvn clean package -DskipTests'
-                }
-            }
-        }
-
-        stage('Build Backend Docker Image') {
-            steps {
-                dir('backend') {
-                    sh 'docker build -t ${BACKEND_IMAGE} .'
-                }
-            }
-        }
-
-        stage('Build Frontend Docker Image') {
-            steps {
-                dir('frontend') {
-                    sh 'docker build -t ${FRONTEND_IMAGE} .'
-                }
-            }
-        }
-
-        stage('Stop Old Containers') {
+        stage('Build Docker Images') {
             steps {
                 sh '''
+                    docker build -t backend:latest ./backend
+                    docker build -t frontend:latest ./frontend
+                '''
+            }
+        }
+
+        stage('Run Containers') {
+            steps {
+                sh '''
+                    # Stop old containers if running
                     docker stop backend || true
                     docker rm backend || true
 
                     docker stop frontend || true
                     docker rm frontend || true
-                '''
-            }
-        }
 
-        stage('Run Backend Container') {
-            steps {
-                sh '''
-                    docker run -d --name backend -p 8084:8084 ${BACKEND_IMAGE}
-                '''
-            }
-        }
-
-        stage('Run Frontend Container') {
-            steps {
-                sh '''
-                    docker run -d --name frontend -p 8501:8501 ${FRONTEND_IMAGE}
+                    # Run new containers
+                    docker run -d --name backend -p 8084:8084 backend:latest
+                    docker run -d --name frontend -p 8501:8501 frontend:latest
                 '''
             }
         }
@@ -70,10 +39,10 @@ pipeline {
 
     post {
         success {
-            echo "🚀 Deployment completed successfully!"
+            echo "🎉 Simple pipeline done!"
         }
         failure {
-            echo "❌ Deployment failed!"
+            echo "❌ Pipeline failed!"
         }
     }
 }
