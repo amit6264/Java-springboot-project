@@ -1,16 +1,21 @@
 pipeline {
     agent any
 
+    environment {
+        BACKEND_IMAGE = "backend:latest"
+        FRONTEND_IMAGE = "frontend:latest"
+    }
+
     stages {
-        
-        stage('Clone Repo') {
+
+        stage('Clone Repository') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/amit6264/YOUR_REPO.git'
+                    url: 'https://github.com/amit6264/Java-springboot-project.git'
             }
         }
 
-        stage('Build Backend Jar') {
+        stage('Build Backend JAR') {
             steps {
                 dir('backend') {
                     sh 'mvn clean package -DskipTests'
@@ -21,7 +26,7 @@ pipeline {
         stage('Build Backend Docker Image') {
             steps {
                 dir('backend') {
-                    sh 'docker build -t backend:latest .'
+                    sh 'docker build -t ${BACKEND_IMAGE} .'
                 }
             }
         }
@@ -29,12 +34,12 @@ pipeline {
         stage('Build Frontend Docker Image') {
             steps {
                 dir('frontend') {
-                    sh 'docker build -t frontend:latest .'
+                    sh 'docker build -t ${FRONTEND_IMAGE} .'
                 }
             }
         }
 
-        stage('Stop Existing Containers') {
+        stage('Stop Old Containers') {
             steps {
                 sh '''
                     docker stop backend || true
@@ -48,23 +53,27 @@ pipeline {
 
         stage('Run Backend Container') {
             steps {
-                sh 'docker run -d --name backend -p 8084:8084 backend:latest'
+                sh '''
+                    docker run -d --name backend -p 8084:8084 ${BACKEND_IMAGE}
+                '''
             }
         }
 
         stage('Run Frontend Container') {
             steps {
-                sh 'docker run -d --name frontend -p 8501:8501 frontend:latest'
+                sh '''
+                    docker run -d --name frontend -p 8501:8501 ${FRONTEND_IMAGE}
+                '''
             }
         }
     }
 
     post {
         success {
-            echo "Deployment Successful!"
+            echo "🚀 Deployment completed successfully!"
         }
         failure {
-            echo "Deployment Failed!"
+            echo "❌ Deployment failed!"
         }
     }
 }
