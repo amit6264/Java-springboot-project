@@ -112,4 +112,4 @@ jobs:
               > $LOG_DIR/nohup.out 2>&1 &
 
             echo "🚀 Application started successfully"
-#The End
+#The 
