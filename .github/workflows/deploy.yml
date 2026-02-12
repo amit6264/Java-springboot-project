@@ -1,4 +1,3 @@
-
 name: Deploy to EC2 full cicd pipeline
 
 on:
@@ -19,27 +18,27 @@ jobs:
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      - name: Deploy on EC2
+      - name: Deploy on EC2 (Amazon Linux 2023)
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }} << 'EOF'
-          
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_IP }} << 'EOF'
+
           echo "=== Updating EC2 ==="
-          sudo apt update -y
+          sudo dnf update -y
 
           echo "=== Installing Docker ==="
-          sudo apt install docker.io -y
+          sudo dnf install docker -y
           sudo systemctl start docker
           sudo systemctl enable docker
-          sudo usermod -aG docker ubuntu
+          sudo usermod -aG docker ec2-user
 
           echo "=== Installing Git ==="
-          sudo apt install git -y
+          sudo dnf install git -y
 
-          echo "=== Installing Java (for Spring Boot) ==="
-          sudo apt install openjdk-17-jdk -y
+          echo "=== Installing Java 17 (Spring Boot) ==="
+          sudo dnf install java-17-amazon-corretto -y
 
-          echo "=== Cloning/Pulling Repo ==="
-          cd /home/ubuntu/
+          echo "=== Create Project Folder if Missing ==="
+          cd /home/ec2-user/
           if [ ! -d "project" ]; then
             git clone https://github.com/amit6264/Java-springboot-project.git project
           fi
@@ -62,5 +61,4 @@ jobs:
           sudo docker run -d --name frontend -p 8501:8501 frontend:latest
 
           echo "=== Deployment Finished Successfully ==="
-
           EOF
