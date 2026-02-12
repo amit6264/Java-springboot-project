@@ -34,7 +34,7 @@ jobs:
     - name: Push backend image
       run: docker push ${{ secrets.DOCKER_USERNAME }}/backend:latest
 
-    # --- Build Frontend ---
+    # --- Build  Frontend ---
     - name: Install Node.js
       uses: actions/setup-node@v3
       with:
